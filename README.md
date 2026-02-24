@@ -29,12 +29,14 @@ Edit `.env` with your Acumatica credentials:
 
 ```env
 ACU_BASE_URL=https://yourinstance.acumatica.com/YourCompany
-ACU_USERNAME=your_api_user
+ACU_USERNAME=mcp-user
 ACU_PASSWORD=your_password
 ACU_COMPANY=YourCompanyLoginName
 ACU_ENDPOINT=Default
 ACU_VERSION=25.200.001
 ```
+
+> **Warning:** Use a dedicated service account (e.g. `mcp-user`). Do NOT use your personal Acumatica login.
 
 Then build:
 
@@ -56,7 +58,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "args": ["/absolute/path/to/acu-mcp/dist/index.js"],
       "env": {
         "ACU_BASE_URL": "https://yourinstance.acumatica.com/YourCompany",
-        "ACU_USERNAME": "your_api_user",
+        "ACU_USERNAME": "mcp-user",
         "ACU_PASSWORD": "your_password",
         "ACU_COMPANY": "YourCompanyLoginName",
         "ACU_ENDPOINT": "Default",
@@ -79,7 +81,7 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
       "args": ["C:\\absolute\\path\\to\\acu-mcp\\dist\\index.js"],
       "env": {
         "ACU_BASE_URL": "https://yourinstance.acumatica.com/YourCompany",
-        "ACU_USERNAME": "your_api_user",
+        "ACU_USERNAME": "mcp-user",
         "ACU_PASSWORD": "your_password",
         "ACU_COMPANY": "YourCompanyLoginName",
         "ACU_ENDPOINT": "Default",
