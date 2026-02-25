@@ -4,6 +4,7 @@ import { registerInventoryTools } from './inventory.js';
 import { registerShipmentTools } from './shipments.js';
 import { registerInvoiceTools } from './invoices.js';
 import { registerPurchaseOrderTools } from './purchase-orders.js';
+import { registerCustomerTools } from './customers.js';
 
 export function registerAllTools(server: McpServer): void {
   registerSalesOrderTools(server);
@@ -11,4 +12,5 @@ export function registerAllTools(server: McpServer): void {
   registerShipmentTools(server);
   registerInvoiceTools(server);
   registerPurchaseOrderTools(server);
+  registerCustomerTools(server);
 }
