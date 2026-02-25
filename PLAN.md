@@ -223,11 +223,22 @@ acu-mcp/
 - [ ] Wire into Claude Desktop / Claude Code
 
 ### Phase 2 — Expand Entities & Analytics
-- [ ] AR Invoices / Payments tools (likely via GI)
+
+#### Blocked: Publish MCP Custom Endpoint in Acumatica
+- [ ] Endpoint `MCP 1.0.0` created in SM207090 with `AR-Customers` + `SO-SalesOrder` as
+      Top-Level entities — but no Publish button visible. Check:
+      - Actions / gear menu on the endpoint screen
+      - System > Customization > Publish Customizations (SM204505)
+      Once published, add `ACU_GI_ENDPOINT=MCP` + `ACU_GI_VERSION=1.0.0` to `.env` and build
+      GI-based tools for `AR-Customers` and `SO-SalesOrder`.
+
+#### Remaining work
+- [ ] AR-Customers GI tool (blocked above)
+- [ ] SO-SalesOrder GI tool (blocked above)
 - [ ] GL account balance tools
 - [ ] Generic GI passthrough tool — query any GI by name + params
 - [ ] MCP Resources exposing entity field schemas
-- [ ] MCP Prompts for common analytics questions (e.g., "Summarize open SOs by customer")
+- [ ] MCP Prompts for common analytics questions
 - [ ] Pagination handling for large result sets (`$skip` loop or cursor)
 
 ### Phase 3 — Production Hardiness
