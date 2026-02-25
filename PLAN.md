@@ -262,8 +262,6 @@ ACU_ENDPOINT=Default
 ACU_VERSION=25.200.001
 
 # GI names (update if your GI has a different name)
-ACU_GI_SALES_ORDERS=SO-SalesOrder
-
 # Optional
 ACU_TIMEOUT_MS=30000
 ```
@@ -287,7 +285,6 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
         "ACU_COMPANY": "TuxtonTest",
         "ACU_ENDPOINT": "Default",
         "ACU_VERSION": "25.200.001",
-        "ACU_GI_SALES_ORDERS": "SalesOrderAnalytics"
       }
     }
   }
