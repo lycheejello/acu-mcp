@@ -16,19 +16,38 @@ export function registerSalesOrderTools(server: McpServer): void {
       orderby: z.string().optional().describe(
         "OData $orderby. Example: \"OrderDate desc\""
       ),
+      inventoryID: z.string().optional().describe(
+        'Filter to orders that contain this inventory item in any line, e.g. "WIDGET-001"'
+      ),
       top: z.number().optional().describe('Max records to return (default 50, max 500)'),
       skip: z.number().optional().describe('Records to skip for pagination'),
     },
-  }, async ({ filter, orderby, top, skip }) => {
+  }, async ({ filter, orderby, inventoryID, top, skip }) => {
     const params: Record<string, string> = {};
 
     if (filter) params['$filter'] = filter;
     if (orderby) params['$orderby'] = orderby;
     if (skip) params['$skip'] = String(skip);
     params['$top'] = String(Math.min(top ?? 50, 500));
+    if (inventoryID) params['$expand'] = 'Details';
 
     const data = await client.getEntity('SalesOrder', params);
-    const rows = Array.isArray(data) ? data : [];
+    let rows = Array.isArray(data) ? data : [];
+
+    if (inventoryID) {
+      const id = inventoryID.toUpperCase();
+      rows = rows.filter((order: Record<string, unknown>) => {
+        const details = order['Details'];
+        if (!Array.isArray(details)) return false;
+        return details.some((line: Record<string, unknown>) => {
+          const inv = line['InventoryID'];
+          const val = typeof inv === 'object' && inv !== null ? (inv as Record<string, unknown>)['value'] : inv;
+          return typeof val === 'string' && val.toUpperCase() === id;
+        });
+      });
+      // Strip detail lines — return headers only
+      rows = rows.map(({ Details: _details, ...header }: Record<string, unknown>) => header);
+    }
 
     return {
       content: [{

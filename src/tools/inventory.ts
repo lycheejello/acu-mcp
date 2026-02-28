@@ -46,7 +46,7 @@ export function registerInventoryTools(server: McpServer): void {
     const data = await client.getEntityByKey(
       'StockItem',
       [inventoryID],
-      { '$expand': 'WarehouseDetails' }
+      { '$expand': 'WarehouseDetails,Attributes' }
     );
 
     return {
