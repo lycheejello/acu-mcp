@@ -43,9 +43,14 @@ export function registerCustomerTools(server: McpServer): void {
       'Get a specific Acumatica customer with full detail including billing, shipping, and credit info.',
     inputSchema: {
       customerID: z.string().describe("Customer ID, e.g. '10001'"),
+      select: z.string().optional().describe(
+        "Comma-separated fields to return, e.g. \"CustomerID,CustomerName,CreditLimit,Balance\". Omit for all fields."
+      ),
     },
-  }, async ({ customerID }) => {
-    const data = await client.getEntityByKey('Customer', [customerID]);
+  }, async ({ customerID, select }) => {
+    const params: Record<string, string> = {};
+    if (select) params['$select'] = select;
+    const data = await client.getEntityByKey('Customer', [customerID], params);
 
     return {
       content: [{ type: 'text', text: JSON.stringify(data, null, 2) }],

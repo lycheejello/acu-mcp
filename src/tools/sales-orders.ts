@@ -19,17 +19,20 @@ export function registerSalesOrderTools(server: McpServer): void {
       inventoryID: z.string().optional().describe(
         'Filter to orders that contain this inventory item in any line, e.g. "WIDGET-001"'
       ),
+      includeDetails: z.boolean().optional().describe(
+        'Set true to expand line items inline. Increases payload size significantly; use with a low top value.'
+      ),
       top: z.number().optional().describe('Max records to return (default 50, max 500)'),
       skip: z.number().optional().describe('Records to skip for pagination'),
     },
-  }, async ({ filter, orderby, inventoryID, top, skip }) => {
+  }, async ({ filter, orderby, inventoryID, includeDetails, top, skip }) => {
     const params: Record<string, string> = {};
 
     if (filter) params['$filter'] = filter;
     if (orderby) params['$orderby'] = orderby;
-    if (skip) params['$skip'] = String(skip);
+    if (skip !== undefined) params['$skip'] = String(skip);
     params['$top'] = String(Math.min(top ?? 50, 500));
-    if (inventoryID) params['$expand'] = 'Details';
+    if (inventoryID || includeDetails) params['$expand'] = 'Details';
 
     const data = await client.getEntity('SalesOrder', params);
     let rows = Array.isArray(data) ? data : [];
@@ -45,8 +48,10 @@ export function registerSalesOrderTools(server: McpServer): void {
           return typeof val === 'string' && val.toUpperCase() === id;
         });
       });
-      // Strip detail lines — return headers only
-      rows = rows.map(({ Details: _details, ...header }: Record<string, unknown>) => header);
+      // Strip detail lines unless caller also wants them
+      if (!includeDetails) {
+        rows = rows.map(({ Details: _details, ...header }: Record<string, unknown>) => header);
+      }
     }
 
     return {
@@ -64,12 +69,17 @@ export function registerSalesOrderTools(server: McpServer): void {
     inputSchema: {
       orderType: z.string().describe("Order type code, e.g. 'SO', 'QT', 'IN'"),
       orderNbr: z.string().describe("Order number, e.g. '000001'"),
+      select: z.string().optional().describe(
+        "Comma-separated header fields to return, e.g. \"OrderNbr,CustomerID,OrderTotal,Status\". Omit for all fields."
+      ),
     },
-  }, async ({ orderType, orderNbr }) => {
+  }, async ({ orderType, orderNbr, select }) => {
+    const params: Record<string, string> = { '$expand': 'Details' };
+    if (select) params['$select'] = select;
     const data = await client.getEntityByKey(
       'SalesOrder',
       [orderType, orderNbr],
-      { '$expand': 'Details' }
+      params
     );
 
     return {

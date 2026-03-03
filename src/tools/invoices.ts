@@ -27,7 +27,7 @@ export function registerInvoiceTools(server: McpServer): void {
 
     if (filter) params['$filter'] = filter;
     if (orderby) params['$orderby'] = orderby;
-    if (skip) params['$skip'] = String(skip);
+    if (skip !== undefined) params['$skip'] = String(skip);
     params['$top'] = String(Math.min(top ?? 50, 500));
     if (inventoryID) params['$expand'] = 'Details';
 
@@ -62,12 +62,17 @@ export function registerInvoiceTools(server: McpServer): void {
     inputSchema: {
       type: z.string().describe("Invoice type, e.g. 'Invoice', 'Credit Memo', 'Debit Memo'"),
       referenceNbr: z.string().describe("Reference number, e.g. 'AR000001'"),
+      select: z.string().optional().describe(
+        "Comma-separated header fields to return, e.g. \"ReferenceNbr,Status,Amount,Customer\". Omit for all fields."
+      ),
     },
-  }, async ({ type, referenceNbr }) => {
+  }, async ({ type, referenceNbr, select }) => {
+    const params: Record<string, string> = { '$expand': 'Details' };
+    if (select) params['$select'] = select;
     const data = await client.getEntityByKey(
       'Invoice',
       [type, referenceNbr],
-      { '$expand': 'Details' }
+      params
     );
 
     return {

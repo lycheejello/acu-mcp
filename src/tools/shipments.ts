@@ -24,7 +24,7 @@ export function registerShipmentTools(server: McpServer): void {
 
     if (filter) params['$filter'] = filter;
     if (orderby) params['$orderby'] = orderby;
-    if (skip) params['$skip'] = String(skip);
+    if (skip !== undefined) params['$skip'] = String(skip);
     params['$top'] = String(Math.min(top ?? 50, 500));
 
     const data = await client.getEntity('Shipment', params);
@@ -43,12 +43,17 @@ export function registerShipmentTools(server: McpServer): void {
       'Get a single Acumatica shipment with full line item detail.',
     inputSchema: {
       shipmentNbr: z.string().describe("Shipment number, e.g. '000001'"),
+      select: z.string().optional().describe(
+        "Comma-separated header fields to return, e.g. \"ShipmentNbr,Status,ShipmentDate,CustomerID\". Omit for all fields."
+      ),
     },
-  }, async ({ shipmentNbr }) => {
+  }, async ({ shipmentNbr, select }) => {
+    const params: Record<string, string> = { '$expand': 'Details' };
+    if (select) params['$select'] = select;
     const data = await client.getEntityByKey(
       'Shipment',
       [shipmentNbr],
-      { '$expand': 'Details' }
+      params
     );
 
     return {

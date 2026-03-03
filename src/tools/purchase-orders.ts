@@ -44,12 +44,17 @@ export function registerPurchaseOrderTools(server: McpServer): void {
     inputSchema: {
       orderType: z.string().describe("Order type, e.g. 'Normal', 'Drop Ship'"),
       orderNbr: z.string().describe("Order number, e.g. 'PO000001'"),
+      select: z.string().optional().describe(
+        "Comma-separated header fields to return, e.g. \"OrderNbr,Status,VendorID,OrderTotal\". Omit for all fields."
+      ),
     },
-  }, async ({ orderType, orderNbr }) => {
+  }, async ({ orderType, orderNbr, select }) => {
+    const params: Record<string, string> = { '$expand': 'Details' };
+    if (select) params['$select'] = select;
     const data = await client.getEntityByKey(
       'PurchaseOrder',
       [orderType, orderNbr],
-      { '$expand': 'Details' }
+      params
     );
 
     return {
