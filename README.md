@@ -18,6 +18,8 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that c
 | `get_purchase_order` | Get a single purchase order with line detail |
 | `query_customers` | List and filter customers |
 | `get_customer` | Get a single customer with contacts and addresses |
+| `list_odata_entities` | Discover all available Generic Inquiry entity sets via OData |
+| `query_odata` | Query any Generic Inquiry by name with OData filter, select, orderby, top, skip |
 
 ## Prerequisites
 
@@ -42,7 +44,8 @@ cp .env.example .env
 ```
 
 ```env
-ACU_BASE_URL=https://yourinstance.acumatica.com/YourCompany
+ACU_BASE_URL=https://yourinstance.acumatica.com/YourTenant
+# OData URL is derived automatically: {ACU_BASE_URL}/odata/{ACU_COMPANY}
 ACU_USERNAME=mcp-user
 ACU_PASSWORD=your_password
 ACU_COMPANY=YourCompanyLoginName
@@ -60,7 +63,7 @@ Run once to register the server globally:
 
 ```bash
 claude mcp add --scope user acumatica \
-  -e ACU_BASE_URL=https://yourinstance.acumatica.com/YourCompany \
+  -e ACU_BASE_URL=https://yourinstance.acumatica.com/YourTenant \
   -e ACU_USERNAME=mcp-user \
   -e ACU_PASSWORD=your_password \
   -e ACU_COMPANY=YourCompanyLoginName \
@@ -82,7 +85,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "node",
       "args": ["/absolute/path/to/acu-mcp/dist/index.js"],
       "env": {
-        "ACU_BASE_URL": "https://yourinstance.acumatica.com/YourCompany",
+        "ACU_BASE_URL": "https://yourinstance.acumatica.com/YourTenant",
         "ACU_USERNAME": "mcp-user",
         "ACU_PASSWORD": "your_password",
         "ACU_COMPANY": "YourCompanyLoginName",
@@ -139,6 +142,6 @@ npm start      # run compiled output
 
 See [PLAN.md](./PLAN.md) for the full architecture and phased development plan.
 
-**Phase 1 (complete):** Core server with 12 tools across Sales Orders, Inventory, Shipments, Invoices, Purchase Orders, and Customers.
-**Phase 2 (in progress):** Generic Inquiry passthrough, GL balance tools, MCP Resources and Prompts.
+**Phase 1 (complete):** Core server with 12 REST tools across Sales Orders, Inventory, Shipments, Invoices, Purchase Orders, and Customers.
+**Phase 2 (in progress):** OData/GI passthrough done (`list_odata_entities` + `query_odata`); GL balance tools and MCP Resources/Prompts still pending.
 **Phase 3:** OAuth 2.0, HTTP/SSE transport, production hardening.
