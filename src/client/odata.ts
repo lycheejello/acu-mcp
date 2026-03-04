@@ -19,20 +19,32 @@ class ODataClient {
     return `${this.config.baseUrl}/odata/${this.config.company}`;
   }
 
+  private get v4ServiceRoot(): string {
+    return `${this.config.baseUrl}/ODataV4/${this.config.company}`;
+  }
+
   private get authHeader(): string {
     return `Basic ${btoa(`${this.config.username}:${this.config.password}`)}`;
   }
 
   async getServiceDocument(): Promise<{ value: { name: string; url: string }[] }> {
-    return this.get('') as Promise<{ value: { name: string; url: string }[] }>;
+    return this.get(this.serviceRoot, '') as Promise<{ value: { name: string; url: string }[] }>;
   }
 
   async queryEntity(name: string, params?: Record<string, string>): Promise<{ value: unknown[] }> {
-    return this.get(`/${encodeURIComponent(name)}`, params) as Promise<{ value: unknown[] }>;
+    return this.get(this.serviceRoot, `/${encodeURIComponent(name)}`, params) as Promise<{ value: unknown[] }>;
   }
 
-  private async get(path: string, params?: Record<string, string>): Promise<unknown> {
-    const url = new URL(`${this.serviceRoot}${path}`);
+  async getV4ServiceDocument(): Promise<{ value: { name: string; url: string }[] }> {
+    return this.get(this.v4ServiceRoot, '') as Promise<{ value: { name: string; url: string }[] }>;
+  }
+
+  async queryV4Entity(name: string, params?: Record<string, string>): Promise<{ value: unknown[] }> {
+    return this.get(this.v4ServiceRoot, `/${encodeURIComponent(name)}`, params) as Promise<{ value: unknown[] }>;
+  }
+
+  private async get(root: string, path: string, params?: Record<string, string>): Promise<unknown> {
+    const url = new URL(`${root}${path}`);
     if (params) {
       for (const [key, value] of Object.entries(params)) {
         url.searchParams.set(key, value);
